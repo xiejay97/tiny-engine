@@ -58,6 +58,11 @@ export const COMPONENT_NAME = {
   Folder: 'Folder'
 }
 
+export const PREVIEW_SANDBOX = {
+  Web: 'Web',
+  CodeSandbox: 'CodeSandbox'
+}
+
 export const ELEMENT_TAG = {
   Body: 'body',
   Div: 'div'

@@ -15,13 +15,14 @@ import { isDevelopEnv } from './environments'
 import useResource from '../src/useResource'
 // prefer old unicode hacks for backward compatibility
 
-const { COMPONENT_NAME } = constants
+const { COMPONENT_NAME, PREVIEW_SANDBOX } = constants
 
 export const utoa = (string) => btoa(unescape(encodeURIComponent(string)))
 
 export const atou = (base64) => decodeURIComponent(escape(atob(base64)))
 
-const open = (params = {}) => {
+const getParams = (_params, type, sandbox) => {
+  const params = Object.assign({ type, sandbox }, _params)
   const paramsMap = new URLSearchParams(location.search)
   params.app = paramsMap.get('id')
   params.tenant = paramsMap.get('tenant')
@@ -30,7 +31,10 @@ const open = (params = {}) => {
     .filter((item) => item.script)
     .reduce((pre, cur) => ({ ...pre, [cur.package]: cur.script }), {})
   params.styles = [...styles]
+  return params
+}
 
+const open = (params = {}) => {
   const href = window.location.href.split('?')[0] || './'
   const tenant = new URLSearchParams(location.search).get('tenant') || ''
   let openUrl = ''
@@ -46,12 +50,10 @@ const open = (params = {}) => {
   aTag.click()
 }
 
-export const previewPage = (params = {}) => {
-  params.type = COMPONENT_NAME.Page
-  open(params)
+export const previewPage = (params = {}, sandbox = PREVIEW_SANDBOX.Web) => {
+  open(getParams(params, COMPONENT_NAME.Page, sandbox))
 }
 
-export const previewBlock = (params = {}) => {
-  params.type = COMPONENT_NAME.Block
-  open(params)
+export const previewBlock = (params = {}, sandbox = PREVIEW_SANDBOX.Web) => {
+  open(getParams(params, COMPONENT_NAME.Block, sandbox))
 }

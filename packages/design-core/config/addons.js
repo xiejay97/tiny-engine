@@ -20,6 +20,7 @@ import Redoundo from '@opentiny/tiny-engine-toolbar-redoundo'
 import Save from '@opentiny/tiny-engine-toolbar-save'
 import Clean from '@opentiny/tiny-engine-toolbar-clean'
 import Preview from '@opentiny/tiny-engine-toolbar-preview'
+import CodeSandbox from '@opentiny/tiny-engine-toolbar-codesandbox'
 import GenerateVue from '@opentiny/tiny-engine-toolbar-generate-vue'
 import Refresh from '@opentiny/tiny-engine-toolbar-refresh'
 import Collaboration from '@opentiny/tiny-engine-toolbar-collaboration'
@@ -56,6 +57,7 @@ const addons = {
     Save,
     GenerateVue,
     Preview,
+    CodeSandbox,
     Redoundo,
     Fullscreen,
     Checkinout,
