@@ -21,6 +21,9 @@ import { getSearchParams } from './preview/http'
 import { BROADCAST_CHANNEL } from '../src/preview/srcFiles/constant'
 import addons from '@opentiny/tiny-engine-app-addons'
 import { injectDebugSwitch } from './preview/debugSwitch'
+import { constants } from '@opentiny/tiny-engine-utils'
+
+const { COMPONENT_NAME } = constants
 
 const getToolbars = (pluginId) => {
   return defineAsyncComponent(() =>
@@ -37,9 +40,13 @@ export default {
     const tools = ['breadcrumb', 'lang', 'media']
     const [Breadcrumb, ChangeLang, ToolbarMedia] = tools.map(getToolbars)
 
-    const { setBreadcrumbPage } = useBreadcrumb()
-    const { pageInfo } = getSearchParams()
-    setBreadcrumbPage([pageInfo?.name])
+    const { setBreadcrumbPage, setBreadcrumbBlock } = useBreadcrumb()
+    const { pageInfo, type } = getSearchParams()
+    if (type === COMPONENT_NAME.Page) {
+      setBreadcrumbPage([pageInfo?.name])
+    } else {
+      setBreadcrumbBlock([pageInfo?.name])
+    }
 
     const setViewPort = (item) => {
       const iframe = document.getElementsByClassName('iframe-container')[0]
