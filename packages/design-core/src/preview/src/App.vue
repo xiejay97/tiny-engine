@@ -77,8 +77,8 @@ export default {
                 version: '0.0.0',
                 private: true,
                 scripts: {
+                  dev: 'vite',
                   build: 'vite build',
-                  dev: 'vite --host',
                   lint: 'pnpm run lint:js && pnpm run lint:style',
                   'lint:fix': 'pnpm run lint:js -- --fix && pnpm run lint:style -- --fix',
                   'lint:js': 'eslint --ext .js,.vue --ignore-path .gitignore src',

@@ -23,18 +23,10 @@
 <script>
 import { reactive } from 'vue'
 import { Popover } from '@opentiny/vue'
-import {
-  getGlobalConfig,
-  useBlock,
-  useCanvas,
-  useNotify,
-  useLayout,
-  useEditorInfo
-} from '@opentiny/tiny-engine-controller'
+import { useNotify, useLayout } from '@opentiny/tiny-engine-controller'
+import getPreGenerateInfo from '@opentiny/tiny-engine-controller/js/generate-files'
 import { fs } from '@opentiny/tiny-engine-utils'
-import { useHttp } from '@opentiny/tiny-engine-http'
-import { generateApp, parseRequiredBlocks } from '@opentiny/tiny-engine-dsl-vue'
-import { fetchMetaData, fetchPageList, fetchBlockSchema } from './http'
+import { generateApp } from '@opentiny/tiny-engine-dsl-vue'
 import FileSelector from './FileSelector.vue'
 
 export default {
@@ -49,9 +41,6 @@ export default {
     }
   },
   setup() {
-    const { isBlock, getCurrentPage } = useCanvas()
-    const { getCurrentBlock } = useBlock()
-
     const state = reactive({
       dirHandle: null,
       generating: false,
@@ -59,164 +48,10 @@ export default {
       saveFilesInfo: []
     })
 
-    const getParams = () => {
-      const { getSchema } = useCanvas().canvasApi.value
-      const params = {
-        framework: getGlobalConfig()?.dslMode,
-        platform: getGlobalConfig()?.platformId,
-        pageInfo: {
-          schema: getSchema()
-        }
-      }
-      const paramsMap = new URLSearchParams(location.search)
-      params.app = paramsMap.get('id')
-      params.tenant = paramsMap.get('tenant')
-
-      if (isBlock()) {
-        const block = getCurrentBlock()
-        params.id = block?.id
-        params.pageInfo.name = block?.label
-        params.type = 'Block'
-      } else {
-        const page = getCurrentPage()
-        params.id = page?.id
-        params.pageInfo.name = page?.name
-        params.type = 'Page'
-      }
-
-      return params
-    }
-
     const initDirHandle = (dirHandle) => {
       if (!state.dirHandle && dirHandle) {
         state.dirHandle = dirHandle
       }
-    }
-
-    const getBlocksSchema = async (pageSchema, blockSet = new Set()) => {
-      let res = []
-
-      const blockNames = parseRequiredBlocks(pageSchema)
-      const promiseList = blockNames
-        .filter((name) => {
-          if (blockSet.has(name)) {
-            return false
-          }
-
-          blockSet.add(name)
-
-          return true
-        })
-        .map((name) => fetchBlockSchema(name))
-      const schemaList = await Promise.allSettled(promiseList)
-      const extraList = []
-
-      schemaList.forEach((item) => {
-        if (item.status === 'fulfilled' && item.value?.[0]?.content) {
-          res.push(item.value[0].content)
-          extraList.push(getBlocksSchema(item.value[0].content, blockSet))
-        }
-      })
-      ;(await Promise.allSettled(extraList)).forEach((item) => {
-        if (item.status === 'fulfilled' && item.value) {
-          res.push(...item.value)
-        }
-      })
-
-      return res
-    }
-
-    const instance = generateApp()
-
-    const getAllPageDetails = async (pageList) => {
-      const detailPromise = pageList.map(({ id }) => useLayout().getPluginApi('AppManage').getPageById(id))
-      const detailList = await Promise.allSettled(detailPromise)
-
-      return detailList
-        .map((item) => {
-          if (item.status === 'fulfilled' && item.value) {
-            return item.value
-          }
-        })
-        .filter((item) => Boolean(item))
-    }
-
-    const getPreGenerateInfo = async () => {
-      const params = getParams()
-      const { id } = useEditorInfo().useInfo()
-      const promises = [
-        useHttp().get(`/app-center/v1/api/apps/schema/${id}`),
-        fetchMetaData(params),
-        fetchPageList(params.app)
-      ]
-
-      if (!state.dirHandle) {
-        promises.push(fs.getUserBaseDirHandle())
-      }
-
-      const [appData, metaData, pageList, dirHandle] = await Promise.all(promises)
-      const pageDetailList = await getAllPageDetails(pageList)
-
-      const blockSet = new Set()
-      const list = pageDetailList.map((page) => getBlocksSchema(page.page_content, blockSet))
-      const blocks = await Promise.allSettled(list)
-
-      const blockSchema = []
-      blocks.forEach((item) => {
-        if (item.status === 'fulfilled' && Array.isArray(item.value)) {
-          blockSchema.push(...item.value)
-        }
-      })
-
-      const appSchema = {
-        // metaData 包含dataSource、utils、i18n、globalState
-        ...metaData,
-        // 页面 schema
-        pageSchema: pageDetailList.map((item) => {
-          const { page_content, ...meta } = item
-
-          return {
-            ...page_content,
-            meta: {
-              ...meta,
-              router: meta.route
-            }
-          }
-        }),
-        blockSchema,
-        // 物料数据
-        componentsMap: [...(appData.componentsMap || [])],
-
-        meta: {
-          ...(appData.meta || {})
-        }
-      }
-
-      const res = await instance.generate(appSchema)
-
-      const { genResult = [] } = res || {}
-      const fileRes = genResult.map(({ fileContent, fileName, path, fileType }) => {
-        const slash = path.endsWith('/') || path === '.' ? '' : '/'
-        let filePath = `${path}${slash}`
-        if (filePath.startsWith('./')) {
-          filePath = filePath.slice(2)
-        }
-        if (filePath.startsWith('.')) {
-          filePath = filePath.slice(1)
-        }
-
-        if (filePath.startsWith('/')) {
-          filePath = filePath.slice(1)
-        }
-
-        return {
-          fileContent,
-          filePath: `${filePath}${fileName}`,
-          fileType
-        }
-      })
-
-      return [dirHandle, fileRes]
     }
 
     const saveCodeToLocal = async (filesInfo) => {
@@ -244,7 +79,11 @@ export default {
 
       try {
         // 保存代码前置任务：调用接口生成代码并获取用户本地文件夹授权
-        const [dirHandle, fileRes] = await getPreGenerateInfo()
+        const instance = generateApp()
+        const [dirHandle, fileRes] = await Promise.all([
+          state.dirHandle ? undefined : fs.getUserBaseDirHandle(),
+          getPreGenerateInfo(instance)
+        ])
 
         // 暂存待生成代码文件信息
         state.saveFilesInfo = fileRes

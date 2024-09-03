@@ -18,10 +18,7 @@ export const codesandboxFiles = {
 "start-app": {
   "name": "Run Dev Server",
   "command": "pnpm run dev",
-  "runAtStart": true,
-  "preview": {
-    "port": 3000
-  }
+  "runAtStart": true
 }
 }
 }

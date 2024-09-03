@@ -21,5 +21,3 @@ export {
   genSFCWithDefaultPlugin,
   generateSFCFile
 } from './generator'
-
-export { parseRequiredBlocks } from './utils/parseRequiredBlocks'
