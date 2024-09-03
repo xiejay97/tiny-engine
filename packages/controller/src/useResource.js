@@ -325,6 +325,13 @@ const initPageOrBlock = async () => {
     return
   }
 
+  const updateUrlPageId = (id) => {
+    const url = new URL(window.location)
+
+    url.searchParams.delete('blockid')
+    url.searchParams.set('pageid', id)
+    window.history.replaceState({}, '', url)
+  }
   // url 没有 pageid 或 blockid，到页面首页或第一页
   const pageInfo = resState.pageTree.find((page) => page?.meta?.isHome) ||
     resState.pageTree.find(
@@ -332,6 +339,7 @@ const initPageOrBlock = async () => {
     ) || {
       componentName: COMPONENT_NAME.Page
     }
+  updateUrlPageId(pageInfo.meta.id)
   initPage(pageInfo)
 }
 
