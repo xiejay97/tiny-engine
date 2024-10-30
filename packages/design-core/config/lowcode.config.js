@@ -33,9 +33,36 @@ export default {
       scripts: [],
       styles: ['/tiny-vue.css']
     },
-    React: {},
+    React: {
+      material: ['/mock/react-bundle.json'],
+      scripts: [],
+      styles: ['/tiny-vue.css']
+    },
     HTML: {},
     Flowchart: {}
+  },
+
+  moduleDisplayStatus: {
+    Vue: {
+      globalState: true,
+      block: true,
+      page: true
+    },
+    React: {
+      globalState: false,
+      block: false,
+      page: false
+    },
+    Angular: {
+      globalState: true,
+      block: true,
+      page: true
+    },
+    HTML: {
+      globalState: true,
+      block: true,
+      page: true
+    }
   },
 
   // 生命周期函数
@@ -65,19 +92,24 @@ export default {
     ],
     HTML: [],
     React: [
+      // 'useEffect',
+      // 'useMemo',
+      // 'useState'
       'componentWillMount',
       'componentDidMount',
-      'componentWillReceiveProps',
+      // 'componentWillReceiveProps', // 被弃用了
       'shouldComponentUpdate',
       'componentWillUpdate',
       'componentDidUpdate',
-      'componentWillUnmount'
+      'componentWillUnmount',
+      'getDerivedStateFromProps'
     ]
   },
 
   // 生命周期使用提示
   lifeCycleTips: {
-    Vue: '通过Vue解构出来的方法都可以在setup这里使用，比如watch、computed、watchEffect等'
+    Vue: '通过Vue解构出来的方法都可以在setup这里使用，比如watch、computed、watchEffect等',
+    React: 'React生命周期可在这正常配置'
   },
 
   // 设计器服务的host

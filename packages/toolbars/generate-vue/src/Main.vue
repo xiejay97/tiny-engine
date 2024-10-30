@@ -33,8 +33,11 @@ import {
 } from '@opentiny/tiny-engine-controller'
 import { fs } from '@opentiny/tiny-engine-utils'
 import { useHttp } from '@opentiny/tiny-engine-http'
-import { generateApp, parseRequiredBlocks } from '@opentiny/tiny-engine-dsl-vue'
-import { fetchMetaData, fetchPageList, fetchBlockSchema } from './http'
+import { parseRequiredBlocks, generateApp as generateVueApp } from '@opentiny/tiny-engine-dsl-vue'
+import { generateApp as generateReactApp } from '@opentiny/tiny-engine-dsl-react'
+// 初期，方便调试
+
+import { fetchMetaData, fetchPageList, fetchBlockSchema, fetchCode } from './http'
 import FileSelector from './FileSelector.vue'
 
 export default {
@@ -59,6 +62,7 @@ export default {
       saveFilesInfo: []
     })
 
+    const curFramework = getGlobalConfig()?.dslMode
     const getParams = () => {
       const { getSchema } = useCanvas().canvasApi.value
       const params = {
@@ -126,7 +130,7 @@ export default {
       return res
     }
 
-    const instance = generateApp()
+    const instance = curFramework === 'React' ? generateReactApp() : generateVueApp()
 
     const getAllPageDetails = async (pageList) => {
       const detailPromise = pageList.map(({ id }) => useLayout().getPluginApi('AppManage').getPageById(id))
@@ -145,7 +149,7 @@ export default {
       const params = getParams()
       const { id } = useEditorInfo().useInfo()
       const promises = [
-        useHttp().get(`/app-center/v1/api/apps/schema/${id}`),
+        curFramework === 'Vue' ? useHttp().get(`/app-center/v1/api/apps/schema/${id}`) : fetchCode(params),
         fetchMetaData(params),
         fetchPageList(params.app)
       ]
@@ -168,7 +172,7 @@ export default {
         }
       })
 
-      const appSchema = {
+      const vueSchema = {
         // metaData 包含dataSource、utils、i18n、globalState
         ...metaData,
         // 页面 schema
@@ -192,7 +196,37 @@ export default {
         }
       }
 
-      const res = await instance.generate(appSchema)
+      const reactSchema = {
+        ...metaData,
+        pageSchema: await Promise.all(
+          pageDetailList.map(async (item) => {
+            const { page_content, ...meta } = item
+            const { framework, platform } = params
+            const schemaInfo = {
+              schema: params.pageInfo.name === item.name ? params.pageInfo.schema : item.page_content, // 这里应该随着页面而改变
+              name: item.name
+            }
+
+            const eachData = await fetchCode({ framework, platform, pageInfo: schemaInfo })
+
+            return {
+              eachData,
+              ...page_content,
+              meta: {
+                ...meta,
+                router: meta.route
+              }
+            }
+          })
+        )
+      }
+
+      const allSchema = {
+        Vue: vueSchema,
+        React: reactSchema
+      }
+
+      const res = await instance.generate(await allSchema[curFramework])
 
       const { genResult = [] } = res || {}
       const fileRes = genResult.map(({ fileContent, fileName, path, fileType }) => {
