@@ -23,7 +23,7 @@
         <tiny-collapse-item title="基本设置" name="base">
           <block-config ref="blockConfigForm"></block-config>
         </tiny-collapse-item>
-        <tiny-collapse-item name="attribute">
+        <tiny-collapse-item v-if="moduleDisplayStatus[dslMode].block" name="attribute">
           <template #title>
             <div class="title-wrapper">
               <span>设置区块暴露属性</span>
@@ -40,7 +40,7 @@
             </block-property>
           </div>
         </tiny-collapse-item>
-        <tiny-collapse-item title="事件设置" name="event">
+        <tiny-collapse-item v-if="moduleDisplayStatus[dslMode].block" title="事件设置" name="event">
           <template #title>
             <div class="title-wrapper">
               <span>事件设置</span>
@@ -78,7 +78,7 @@
 <script lang="jsx">
 import { reactive, ref, watch, watchEffect, computed } from 'vue'
 import { Button as TinyButton, Collapse as TinyCollapse, CollapseItem as TinyCollapseItem } from '@opentiny/vue'
-import { getGlobalConfig, useModal, useBlock } from '@opentiny/tiny-engine-controller'
+import { getGlobalConfig, useModal } from '@opentiny/tiny-engine-controller'
 import { BlockHistoryList, PluginSetting, CloseIcon, SvgButton } from '@opentiny/tiny-engine-common'
 import { previewBlock } from '@opentiny/tiny-engine-controller/js/preview'
 import { LifeCycles } from '@opentiny/tiny-engine-common'
@@ -130,6 +130,8 @@ export default {
     }
   },
   setup() {
+    const dslMode = getGlobalConfig()?.dslMode
+    const moduleDisplayStatus = getGlobalConfig()?.moduleDisplayStatus
     const { confirm } = useModal()
     const editBlock = computed(getEditBlock)
     const blockConfigForm = ref(null)
@@ -212,11 +214,8 @@ export default {
           status,
           message,
           exec: async () => {
-            const currentId = useBlock().getCurrentBlock()?.id
-            if (block.id === currentId) {
-              // 获取区块截图
-              block.screenshot = await getBlockBase64()
-            }
+            // 获取区块截图
+            block.screenshot = await getBlockBase64()
             saveBlock(block)
           }
         })
@@ -279,7 +278,9 @@ export default {
       globalConfig: getGlobalConfig(),
       onMouseLeave,
       handleClick,
-      handleShowGuide
+      handleShowGuide,
+      dslMode,
+      moduleDisplayStatus
     }
   }
 }

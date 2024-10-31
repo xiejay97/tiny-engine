@@ -1,23 +1,14 @@
 <template>
-  <tiny-popover
-    trigger="hover"
-    :open-delay="1000"
-    popper-class="toolbar-right-popover"
-    append-to-body
-    content="生成当前应用代码到本地文件"
-  >
+  <tiny-popover trigger="hover" :open-delay="1000" popper-class="toolbar-right-popover" append-to-body
+    content="生成当前应用代码到本地文件">
     <template #reference>
       <span class="icon" @click="generate">
         <svg-icon :name="icon"></svg-icon>
       </span>
     </template>
   </tiny-popover>
-  <generate-file-selector
-    :visible="state.showDialogbox"
-    :data="state.saveFilesInfo"
-    @confirm="confirm"
-    @cancel="cancel"
-  ></generate-file-selector>
+  <generate-file-selector :visible="state.showDialogbox" :data="state.saveFilesInfo" @confirm="confirm"
+    @cancel="cancel"></generate-file-selector>
 </template>
 
 <script>
@@ -34,7 +25,7 @@ import {
 import { fs } from '@opentiny/tiny-engine-utils'
 import { useHttp } from '@opentiny/tiny-engine-http'
 import { parseRequiredBlocks, generateApp as generateVueApp } from '@opentiny/tiny-engine-dsl-vue'
-import { generateCode, generateApp as generateReactApp } from '@opentiny/tiny-engine-dsl-react'
+import { generateApp as generateReactApp } from '@opentiny/tiny-engine-dsl-react'
 // 初期，方便调试
 
 import { fetchMetaData, fetchPageList, fetchBlockSchema, fetchCode } from './http'
@@ -59,7 +50,7 @@ export default {
       dirHandle: null,
       generating: false,
       showDialogbox: false,
-      saveFilesInfo: []
+      saveFilesInfo: [],
     })
 
     const curFramework = getGlobalConfig()?.dslMode
@@ -121,16 +112,14 @@ export default {
           extraList.push(getBlocksSchema(item.value[0].content, blockSet))
         }
       })
-      ;(await Promise.allSettled(extraList)).forEach((item) => {
-        if (item.status === 'fulfilled' && item.value) {
-          res.push(...item.value)
-        }
-      })
+        ; (await Promise.allSettled(extraList)).forEach((item) => {
+          if (item.status === 'fulfilled' && item.value) {
+            res.push(...item.value)
+          }
+        })
 
       return res
     }
-
-    const instance = curFramework === 'React' ? generateReactApp() : generateVueApp()
 
     const getAllPageDetails = async (pageList) => {
       const detailPromise = pageList.map(({ id }) => useLayout().getPluginApi('AppManage').getPageById(id))
@@ -149,7 +138,9 @@ export default {
       const params = getParams()
       const { id } = useEditorInfo().useInfo()
       const promises = [
-        curFramework === 'Vue' ? useHttp().get(`/app-center/v1/api/apps/schema/${id}`) : fetchCode(params),
+        curFramework === 'Vue' ?
+          useHttp().get(`/app-center/v1/api/apps/schema/${id}`)
+          : fetchCode(params),
         fetchMetaData(params),
         fetchPageList(params.app)
       ]
@@ -159,6 +150,7 @@ export default {
       }
 
       const [appData, metaData, pageList, dirHandle] = await Promise.all(promises)
+
       const pageDetailList = await getAllPageDetails(pageList)
 
       const blockSet = new Set()
@@ -207,7 +199,7 @@ export default {
               name: item.name
             }
 
-            const eachData = generateCode({ framework, platform, pageInfo: schemaInfo })
+            const eachData = await fetchCode({ framework, platform, pageInfo: schemaInfo })
 
             return {
               eachData,
@@ -225,6 +217,13 @@ export default {
         Vue: vueSchema,
         React: reactSchema
       }
+
+      const instance =
+        (curFramework === 'React' ?
+          generateReactApp()
+          :
+          generateVueApp()
+        )
 
       const res = await instance.generate(await allSchema[curFramework])
 

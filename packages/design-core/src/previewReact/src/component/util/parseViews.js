@@ -8,12 +8,10 @@ export const parseView = (views) => {
   let code = views['Main.jsx']
 
   code = code.replace(/Antd/g, 'Antd.')
+
   // 使用正则表达式删除所有 import 语句
   const noImportContent =
-    code
-      .replace(/import\s*\{[^}]*\}\s*from\s*['"].*?['"].*?\n/g, '')
-      .replace(/^import\s+.*$/gm, '')
-      .replace(/export\s+default\s+[A-Za-z0-9_]+\s*/, '') + `\n render(<${name}/>)`
+    code.replace(/^import\s+.*$/gm, '').replace(/export\s+default\s+[A-Za-z0-9_]+\s*/, '') + `\n render(<${name}/>)`
 
   return noImportContent
 }

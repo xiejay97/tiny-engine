@@ -1,4 +1,3 @@
-import { BUILTIN_COMPONENTS_MAP } from '@/constant'
 import { getImportMap } from './parseImport'
 import {
   genTemplateByHook,
@@ -19,8 +18,7 @@ import {
   handleI18nAttrHook,
   handleObjBindAttrHook,
   handleEventAttrHook,
-  handleTinyIconPropsHook,
-  handleJsxModelValueUpdate
+  handleTinyIconPropsHook
 } from './generateAttribute'
 import {
   GEN_SCRIPT_HOOKS,
@@ -214,7 +212,6 @@ export const genSFCWithDefaultPlugin = (schema, componentsMap, config = {}) => {
 
   const defaultAttributeHook = [
     handleTinyGrid,
-    handleJsxModelValueUpdate,
     handleConditionAttrHook,
     handleLoopAttrHook,
     handleSlotBindAttrHook,
@@ -262,10 +259,7 @@ export const genSFCWithDefaultPlugin = (schema, componentsMap, config = {}) => {
     }
   }
 
-  // 兼容单独调用的场景，单独调用时，这里会默认加上 builtInComponents
-  const compsMapWithBuiltIn = [...componentsMap, ...BUILTIN_COMPONENTS_MAP]
-
-  return generateSFCFile(schema, compsMapWithBuiltIn, newConfig)
+  return generateSFCFile(schema, componentsMap, newConfig)
 }
 
 export default generateSFCFile

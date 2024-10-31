@@ -29,7 +29,7 @@ function formatCode(options = {}) {
     description: 'transform block schema to code',
     /**
      * 格式化出码
-     * @param {import('@opentiny/tiny-engine-dsl-vue').IAppSchema} schema
+     * @param {tinyEngineDslVue.IAppSchema} schema
      * @returns
      */
     run(schema, context) {

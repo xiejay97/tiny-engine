@@ -1,4 +1,5 @@
 import { mergeOptions } from '../utils/mergeOptions'
+// import { genSFCWithDefaultPlugin } from '../generator'
 
 const defaultOption = {
   blockBasePath: './src/components'
@@ -7,7 +8,7 @@ const defaultOption = {
 function genBlockPlugin(options = {}) {
   const realOptions = mergeOptions(defaultOption, options)
 
-  const { blockBasePath } = realOptions
+  const { blockBasePath, sfcConfig = {} } = realOptions
 
   return {
     name: 'tinyEngine-generateCode-plugin-block',
@@ -19,6 +20,7 @@ function genBlockPlugin(options = {}) {
      */
     run(schema) {
       const blocks = schema?.blockSchema || []
+      const componentsMap = schema?.componentsMap
 
       if (blocks && !Array.isArray(blocks)) {
         throw new Error(`[codeGenerate][plugins] blockSchema should be array, but actually receive ${typeof blocks}`)
@@ -27,6 +29,8 @@ function genBlockPlugin(options = {}) {
       const resBlocks = []
 
       for (const block of blocks) {
+        // const res = genSFCWithDefaultPlugin(block, componentsMap, { blockRelativePath: './', ...sfcConfig })
+
         resBlocks.push({
           fileType: 'vue',
           fileName: `${block.fileName}.vue`,

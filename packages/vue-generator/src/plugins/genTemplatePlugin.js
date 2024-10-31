@@ -18,7 +18,7 @@ function genTemplatePlugin(options = {}) {
         return
       }
 
-      const template = options?.template || 'default'
+      const template = context?.template || 'default'
 
       if (!template) {
         return

@@ -15,8 +15,8 @@ import CodeGenerator from './codeGenerator'
 
 /**
  * 整体应用出码
- * @param {import('@opentiny/tiny-engine-dsl-vue').IConfig} config
- * @returns {import('@opentiny/tiny-engine-dsl-vue').codeGenInstance}
+ * @param {tinyEngineDslVue.IConfig} config
+ * @returns {tinyEngineDslVue.codeGenInstance}
  */
 
 export function generateApp(config = {}) {

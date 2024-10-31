@@ -1,4 +1,4 @@
-import { BUILTIN_COMPONENTS_MAP } from '@/constant'
+import { BUILTIN_COMPONENTS_MAP } from '../constant'
 
 function parseSchema() {
   return {
@@ -7,7 +7,7 @@ function parseSchema() {
 
     /**
      * 解析schema，预处理 schema
-     * @param {import('@opentiny/tiny-engine-dsl-vue').IAppSchema} schema
+     * @param {tinyEngineDslVue.IAppSchema} schema
      * @returns
      */
     run(schema) {
