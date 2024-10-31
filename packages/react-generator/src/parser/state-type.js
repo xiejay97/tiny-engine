@@ -16,11 +16,7 @@ import { getFunctionInfo, isGetter } from '../utils'
 const { start, end } = UNWRAP_QUOTES
 
 const strategy = {
-  [JS_EXPRESSION]: ({ value, computed }) => {
-    // if (computed) {
-    //   return `${start}vue.computed(${value})${end}`
-    // }
-
+  [JS_EXPRESSION]: ({ value }) => {
     return `${start}${value}${end}`
   },
 
@@ -42,17 +38,6 @@ const strategy = {
 
     return `${start}${value}${end}`
   }
-
-  // [JS_SLOT]: ({ value = [], params = ['row'] }, description) => {
-  //   description.hasJSX = true
-
-  //   // 处理协议中的特殊情况，如：Icon 协议转换、Collection 使用 div 渲染
-  //   value.forEach(preProcess)
-  //   const slotValues = value.map((item) => generateJSXTemplate(item, description)).join('')
-
-  //   // 默认解构参数 row，因为jsx slot 必须有第二个参数 h
-  //   return `${start}({ ${params.join(',')} }, h) => ${slotValues}${end}`
-  // }
 }
 
 /**

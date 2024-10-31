@@ -13,7 +13,6 @@
 const path = require('path')
 const fs = require('fs-extra')
 const prettier = require('prettier')
-const { execSync } = require('child_process')
 const { generateCode } = require('../../../dist/tiny-engine-dsl-react.cjs')
 const { logger } = require('../../utils/logger')
 
@@ -59,10 +58,10 @@ const generateFiles = ({ testCaseFile, result }) => {
   })
 }
 
-const runEslint = ({ testCaseFile }) => {
-  const eslintCmd = `node ./node_modules/eslint/bin/eslint.js test/testcases/full/${testCaseFile.name}/result --ext .js,.vue`
-  execSync(eslintCmd, { cwd: process.cwd(), stdio: [0, 1, 2] })
-}
+// const runEslint = ({ testCaseFile }) => {
+//   const eslintCmd = `node ./node_modules/eslint/bin/eslint.js test/testcases/full/${testCaseFile.name}/result --ext .js,.vue`
+//   execSync(eslintCmd, { cwd: process.cwd(), stdio: [0, 1, 2] })
+// }
 
 const runTestCases = () => {
   const testCaseConfig = require(path.resolve(__dirname, 'index.config.js'))

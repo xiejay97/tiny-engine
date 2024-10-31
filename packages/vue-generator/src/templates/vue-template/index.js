@@ -161,21 +161,21 @@ export function generateTemplate(schema) {
   ]
 
   // FIXME: vitest 测试的时候得到的并不是 base64data，所以这里需要跳过文件的出码
-  if (process.env?.NODE_ENV !== 'test') {
-    try {
-      const faviconData = base64ToBlob(logoImage)
+  // if (process.env?.NODE_ENV !== 'test') {
+  try {
+    const faviconData = base64ToBlob(logoImage)
 
-      res.push({
-        fileType: 'image/x-icon',
-        fileName: 'favicon.ico',
-        path: './public',
-        fileContent: faviconData
-      })
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('generate favicon.ico error', error)
-    }
+    res.push({
+      fileType: 'image/x-icon',
+      fileName: 'favicon.ico',
+      path: './public',
+      fileContent: faviconData
+    })
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('generate favicon.ico error', error)
   }
+  // }
 
   return res
 }

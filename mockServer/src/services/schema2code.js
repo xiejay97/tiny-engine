@@ -50,7 +50,7 @@ export default class Schema2CodeServcice {
       main: defaultMain
     })
 
-    const { generateCode } = require('@opentiny/tiny-engine-dsl-react')
+    const { generateCode } = require('@opentiny/tiny-engine-dsl-vue')
     let code
     try {
       code = generateCode({

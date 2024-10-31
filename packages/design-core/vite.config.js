@@ -131,7 +131,7 @@ const config = {
 
 const importMapVersions = {
   prettier: '2.7.1',
-  vue: '3.4.21',
+  vue: '3.4.23',
   tinyVue: '~3.14'
 }
 

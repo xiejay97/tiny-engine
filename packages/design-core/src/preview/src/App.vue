@@ -1,17 +1,21 @@
 <template>
   <Toolbar v-if="showToolbar" />
-  <Preview />
+  <PreviewReact v-if="showReact" />
+  <PreviewVue v-if="showVue" />
 </template>
 
 <script>
 import { useDebugSwitch } from './preview/debugSwitch'
-import Preview from './preview/Preview.vue'
+import Config from '../../../config/lowcode.config'
+import PreviewReact from './previewReact/Preview.vue'
+import PreviewVue from './preview/Preview.vue'
 import Toolbar from './Toolbar.vue'
 import '@opentiny/tiny-engine-theme'
 
 export default {
   components: {
-    Preview,
+    PreviewReact,
+    PreviewVue,
     Toolbar
   },
   props: {
@@ -22,6 +26,13 @@ export default {
   },
   setup() {
     useDebugSwitch()
+    const showReact = (Config.dslMode === 'React')
+    const showVue = (Config.dslMode === 'Vue')
+
+    return {
+      showReact,
+      showVue
+    }
   }
 }
 </script>

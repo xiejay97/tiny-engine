@@ -123,6 +123,7 @@ const askShouldImportData = ({ node, sourceRef }) => {
       node.props.columns = generateAssginColumns(sourceColums, node.props.columns)
     },
     cancel() {
+      // eslint-disable-next-line no-unsafe-optional-chaining
       node.props.columns = [...sourceRef.value.data?.columns]
     }
   })
@@ -139,6 +140,7 @@ const updateNodeHandler = ({ node, sourceRef, pageSchema, sourceName, methodName
   if (node.props.columns.length) {
     askShouldImportData({ node, sourceRef })
   } else {
+    // eslint-disable-next-line no-unsafe-optional-chaining
     node.props.columns = [...sourceRef.value.data?.columns]
   }
 

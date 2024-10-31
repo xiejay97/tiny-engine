@@ -23,7 +23,7 @@
         <tiny-collapse-item title="基本设置" name="base">
           <block-config ref="blockConfigForm"></block-config>
         </tiny-collapse-item>
-        <tiny-collapse-item v-if="moduleDisplayStatus[dslMode].block" name="attribute">
+        <tiny-collapse-item name="attribute">
           <template #title>
             <div class="title-wrapper">
               <span>设置区块暴露属性</span>
@@ -40,7 +40,7 @@
             </block-property>
           </div>
         </tiny-collapse-item>
-        <tiny-collapse-item v-if="moduleDisplayStatus[dslMode].block" title="事件设置" name="event">
+        <tiny-collapse-item title="事件设置" name="event">
           <template #title>
             <div class="title-wrapper">
               <span>事件设置</span>
@@ -130,8 +130,6 @@ export default {
     }
   },
   setup() {
-    const dslMode = getGlobalConfig()?.dslMode
-    const moduleDisplayStatus = getGlobalConfig()?.moduleDisplayStatus
     const { confirm } = useModal()
     const editBlock = computed(getEditBlock)
     const blockConfigForm = ref(null)
@@ -281,9 +279,7 @@ export default {
       globalConfig: getGlobalConfig(),
       onMouseLeave,
       handleClick,
-      handleShowGuide,
-      dslMode,
-      moduleDisplayStatus
+      handleShowGuide
     }
   }
 }
