@@ -112,6 +112,7 @@ export default {
           document.body.append(form)
           form.submit()
           document.body.removeChild(form)
+          state.generating = false
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error(error)
